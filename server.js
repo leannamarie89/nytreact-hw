@@ -1,16 +1,31 @@
-var express = require('express');
-var app = express();
-var PORT = process.env.PORT || 8080
+const express = require("express");
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+const routes = require("./routes");
+const app = express();
+const PORT = process.env.PORT || 8080;
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("client/build"));
+}
 
 
-app.get('/', function(req, res) {
-    res.send('good question Paul!')
-})
-app.get('/api/articles', function(req, res) {
-    res.send('articles will go here.')
-})
+app.use(routes);
 
-app.listen(PORT, function() {
-    console.log('listening on port: ${PORT}')
-});
 
+mongoose.Promise = global.Promise;
+
+mongoose.connect(
+  process.env.MONGODB_URI || "mongodb://localhost/nytarticles",
+  {
+    useMongoClient: true
+  }
+);
+
+
+app.listen(PORT, () =>
+  console.log(  ==> API Server now listening on PORT ${PORT}!`)
+);
